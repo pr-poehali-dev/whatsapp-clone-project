@@ -43,6 +43,17 @@ interface Call {
   duration?: string;
 }
 
+interface Group {
+  id: number;
+  name: string;
+  avatar: string;
+  description: string;
+  members: number;
+  lastMessage: string;
+  time: string;
+  unread: number;
+}
+
 interface Message {
   id: number;
   text: string;
@@ -58,6 +69,7 @@ const Index = () => {
   const [newMessage, setNewMessage] = useState('');
   const [showProfile, setShowProfile] = useState(false);
   const [showContacts, setShowContacts] = useState(false);
+  const [showGroups, setShowGroups] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     { id: 1, text: 'Привет! Как дела?', time: '10:25', isMine: false, status: 'read' },
     { id: 2, text: 'Привет! Все отлично, спасибо!', time: '10:26', isMine: true, status: 'read' },
@@ -95,6 +107,13 @@ const Index = () => {
     { id: 4, name: 'Дмитрий Смирнов', avatar: '', type: 'incoming', time: '15.11, 09:15', duration: '3:45' },
   ];
 
+  const groups: Group[] = [
+    { id: 1, name: 'Рабочая группа', avatar: '', description: 'Обсуждение рабочих вопросов', members: 12, lastMessage: 'Встреча перенесена на 15:00', time: '09:15', unread: 0 },
+    { id: 2, name: 'Команда проекта', avatar: '', description: 'Основной проект компании', members: 8, lastMessage: 'Новая задача добавлена', time: '15.11', unread: 3 },
+    { id: 3, name: 'Семья', avatar: '', description: 'Семейный чат', members: 5, lastMessage: 'Когда соберемся?', time: 'Вчера', unread: 1 },
+    { id: 4, name: 'Футбол по выходным', avatar: '', description: 'Организация игр', members: 15, lastMessage: 'В эту субботу играем!', time: '14.11', unread: 0 },
+  ];
+
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
@@ -122,6 +141,9 @@ const Index = () => {
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold">Whatscok</h1>
             <div className="flex gap-2">
+              <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary/90" onClick={() => setShowGroups(true)}>
+                <Icon name="Users" size={20} />
+              </Button>
               <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary/90" onClick={() => setShowContacts(true)}>
                 <Icon name="UserPlus" size={20} />
               </Button>
@@ -283,7 +305,87 @@ const Index = () => {
         </div>
       </div>
 
-      {showContacts ? (
+      {showGroups ? (
+        <div className="flex-1 flex flex-col">
+          <div className="p-4 border-b bg-background flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" onClick={() => setShowGroups(false)}>
+                <Icon name="ArrowLeft" size={20} />
+              </Button>
+              <h2 className="text-xl font-semibold">Группы</h2>
+            </div>
+            <Button size="icon" className="bg-primary hover:bg-primary/90">
+              <Icon name="Plus" size={20} />
+            </Button>
+          </div>
+
+          <div className="px-4 py-2 border-b">
+            <div className="relative">
+              <Icon name="Search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Поиск групп..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          <ScrollArea className="flex-1">
+            <div className="p-4">
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3 px-2">МОИ ГРУППЫ ({groups.length})</h3>
+              {groups
+                .filter(group => 
+                  group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  group.description.toLowerCase().includes(searchQuery.toLowerCase())
+                )
+                .map((group) => (
+                <Card
+                  key={group.id}
+                  className="p-4 mb-2 rounded-lg cursor-pointer hover:bg-accent/5 transition-colors"
+                >
+                  <div className="flex items-start gap-3">
+                    <Avatar className="w-12 h-12">
+                      <AvatarImage src={group.avatar} />
+                      <AvatarFallback className="bg-primary/10 text-primary">{getInitials(group.name)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className="font-medium truncate">{group.name}</h3>
+                        <span className="text-xs text-muted-foreground">{group.time}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-1">{group.description}</p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Icon name="Users" size={12} />
+                          <span>{group.members} участников</span>
+                        </div>
+                        {group.unread > 0 && (
+                          <Badge className="bg-primary text-primary-foreground">{group.unread}</Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground truncate mt-1">{group.lastMessage}</p>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+              {groups.filter(group => 
+                group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                group.description.toLowerCase().includes(searchQuery.toLowerCase())
+              ).length === 0 && (
+                <div className="text-center py-12">
+                  <Icon name="Users" size={64} className="mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">Группы не найдены</p>
+                  <Button className="mt-4 bg-primary hover:bg-primary/90">
+                    <Icon name="Plus" size={16} className="mr-2" />
+                    Создать группу
+                  </Button>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+        </div>
+      ) : showContacts ? (
         <div className="flex-1 flex flex-col">
           <div className="p-4 border-b bg-background flex items-center justify-between">
             <div className="flex items-center gap-3">
