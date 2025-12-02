@@ -87,7 +87,7 @@ const Index = () => {
       <div className="w-full max-w-md border-r flex flex-col">
         <div className="p-4 border-b bg-primary text-primary-foreground">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold">BlueTalk</h1>
+            <h1 className="text-2xl font-bold">Whatscok</h1>
             <div className="flex gap-2">
               <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary/90">
                 <Icon name="Camera" size={20} />
@@ -252,7 +252,7 @@ const Index = () => {
           <div className="w-64 h-64 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
             <Icon name="MessageCircle" size={100} className="text-primary" />
           </div>
-          <h2 className="text-2xl font-bold mb-2">BlueTalk для компьютера</h2>
+          <h2 className="text-2xl font-bold mb-2">Whatscok для компьютера</h2>
           <p className="text-muted-foreground max-w-md">
             Выберите чат слева, чтобы начать общение
           </p>
