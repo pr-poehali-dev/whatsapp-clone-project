@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -70,6 +70,22 @@ const Index = () => {
   const [showProfile, setShowProfile] = useState(false);
   const [showContacts, setShowContacts] = useState(false);
   const [showGroups, setShowGroups] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('theme') === 'dark';
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
   const [messages, setMessages] = useState<Message[]>([
     { id: 1, text: 'Привет! Как дела?', time: '10:25', isMine: false, status: 'read' },
     { id: 2, text: 'Привет! Все отлично, спасибо!', time: '10:26', isMine: true, status: 'read' },
@@ -532,6 +548,20 @@ const Index = () => {
                         <span className="font-medium">Уведомления</span>
                       </div>
                       <Icon name="ChevronRight" size={20} className="text-muted-foreground" />
+                    </div>
+                  </Card>
+
+                  <Card className="p-4 mb-2 cursor-pointer hover:bg-accent/5 transition-colors" onClick={() => setIsDarkMode(!isDarkMode)}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Icon name={isDarkMode ? 'Sun' : 'Moon'} size={20} className="text-primary" />
+                        <span className="font-medium">{isDarkMode ? 'Светлая тема' : 'Темная тема'}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className={`w-10 h-6 rounded-full transition-colors ${isDarkMode ? 'bg-primary' : 'bg-gray-300'} relative`}>
+                          <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${isDarkMode ? 'translate-x-5' : 'translate-x-1'}`} />
+                        </div>
+                      </div>
                     </div>
                   </Card>
 
