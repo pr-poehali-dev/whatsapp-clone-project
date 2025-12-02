@@ -57,6 +57,7 @@ const Index = () => {
   const [selectedChat, setSelectedChat] = useState<number | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [showProfile, setShowProfile] = useState(false);
+  const [showContacts, setShowContacts] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     { id: 1, text: 'Привет! Как дела?', time: '10:25', isMine: false, status: 'read' },
     { id: 2, text: 'Привет! Все отлично, спасибо!', time: '10:26', isMine: true, status: 'read' },
@@ -121,6 +122,9 @@ const Index = () => {
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold">Whatscok</h1>
             <div className="flex gap-2">
+              <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary/90" onClick={() => setShowContacts(true)}>
+                <Icon name="UserPlus" size={20} />
+              </Button>
               <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary/90">
                 <Icon name="Camera" size={20} />
               </Button>
@@ -279,7 +283,85 @@ const Index = () => {
         </div>
       </div>
 
-      {showProfile ? (
+      {showContacts ? (
+        <div className="flex-1 flex flex-col">
+          <div className="p-4 border-b bg-background flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" onClick={() => setShowContacts(false)}>
+                <Icon name="ArrowLeft" size={20} />
+              </Button>
+              <h2 className="text-xl font-semibold">Контакты</h2>
+            </div>
+            <Button size="icon" className="bg-primary hover:bg-primary/90">
+              <Icon name="UserPlus" size={20} />
+            </Button>
+          </div>
+
+          <div className="px-4 py-2 border-b">
+            <div className="relative">
+              <Icon name="Search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Поиск контактов..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          <ScrollArea className="flex-1">
+            <div className="p-4">
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3 px-2">ВСЕ КОНТАКТЫ ({contacts.length})</h3>
+              {contacts
+                .filter(contact => 
+                  contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  contact.phone.includes(searchQuery)
+                )
+                .map((contact) => (
+                <Card
+                  key={contact.id}
+                  className="p-4 mb-2 rounded-lg cursor-pointer hover:bg-accent/5 transition-colors"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <Avatar>
+                          <AvatarImage src={contact.avatar} />
+                          <AvatarFallback className="bg-primary/10 text-primary">{getInitials(contact.name)}</AvatarFallback>
+                        </Avatar>
+                        {contact.online && (
+                          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="font-medium">{contact.name}</h3>
+                        <p className="text-sm text-muted-foreground">{contact.phone}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" className="text-primary hover:bg-primary/10">
+                        <Icon name="MessageCircle" size={20} />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="text-primary hover:bg-primary/10">
+                        <Icon name="Phone" size={20} />
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+              {contacts.filter(contact => 
+                contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                contact.phone.includes(searchQuery)
+              ).length === 0 && (
+                <div className="text-center py-12">
+                  <Icon name="Users" size={64} className="mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">Контакты не найдены</p>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+        </div>
+      ) : showProfile ? (
         <div className="flex-1 flex flex-col">
           <div className="p-4 border-b bg-background flex items-center gap-3">
             <Button variant="ghost" size="icon" onClick={() => setShowProfile(false)}>
